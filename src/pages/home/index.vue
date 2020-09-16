@@ -1,15 +1,65 @@
 <template>
   <view>首页
     <text class="iconfont iconimg"></text>
-    <uni-badge text="1"></uni-badge>
+    <view>
+      <uni-segmented-control
+          :current="current"
+          :values="items.map(v=>v.title)"
+          @clickItem="onClickItem"
+          style-type="text"
+          active-color="#d4237a"></uni-segmented-control>
+      <view class="content">
+        <view v-show="current === 0">
+          <home-recommend></home-recommend>
+        </view>
+        <view v-show="current === 1">
+          <home-category></home-category>
+        </view>
+        <view v-show="current === 2">
+          <home-new></home-new>
+        </view>
+        <view v-show="current === 3">
+          <home-album></home-album>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script>
-import {uniBadge} from '@dcloudio/uni-ui'
+import {uniSegmentedControl} from '@dcloudio/uni-ui';
+import HomeRecommend from "@/components/home/home-recommend/home-recommend";
+import HomeCategory from "@/components/home/home-category/home-category";
+import HomeNew from "@/components/home/home-new/home-new";
+import HomeAlbum from "@/components/home/home-album/home-album";
+
 export default {
   name: "index",
-  components: {uniBadge}
+  components: {
+    HomeAlbum,
+    HomeNew,
+    HomeCategory,
+    HomeRecommend,
+    uniSegmentedControl
+  },
+  data() {
+    return {
+      items: [
+        {title: '推荐'},
+        {title: '分类'},
+        {title: '最新'},
+        {title: '专辑'}
+      ],
+      current: 0
+    }
+  },
+  methods: {
+    onClickItem(e) {
+      if (this.current !== e.currentIndex) {
+        this.current = e.currentIndex;
+      }
+    }
+  }
 }
 </script>
 
