@@ -1,6 +1,5 @@
 <template>
-  <view>首页
-    <text class="iconfont iconimg"></text>
+  <view>
     <view class="home_tab">
       <view class="home_tab_title">
         <view class="title_inner">
