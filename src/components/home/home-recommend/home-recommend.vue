@@ -1,5 +1,9 @@
 <template>
-  <view v-if="recommends.length>0">
+  <scroll-view
+      scroll-y
+      class="recommend_view"
+      v-if="recommends.length>0"
+      @scrolltolower="handleToLower">
     <!--    推荐-->
     <view class="recommend_wrap">
       <view class="recommend_item" v-for="item in recommends" :key="item.id">
@@ -23,7 +27,7 @@
         </view>
       </view>
       <view class="months_content">
-        <view class="months_item" v-for="item in months.items">
+        <view class="months_item" v-for="item in months.items" :key="item._id">
           <image mode="aspectFill" :src="item.thumb+item.rule.replace('$<Height>',375)"></image>
         </view>
       </view>
@@ -31,7 +35,17 @@
 
       </view>
     </view>
-  </view>
+    <view class="hots_wrap">
+      <view class="hots_title">
+        <text>热门</text>
+      </view>
+      <view class="hots_content">
+        <view class="hot_item" v-for="item in hots" :key="item.id">
+          <image mode="widthFix" :src="item.thumb"></image>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
 
 </template>
 
@@ -44,48 +58,86 @@ export default {
   data() {
     return {
       recommends: [],
-      months: []
-    }
-  },
-  mounted() {
-    /**
-     * 获取首页推荐数据
-     */
-    this.request({
-      url: 'http://157.122.54.189:9088/image/v3/homepage/vertical',
-      data: {
+      months: [],
+      hots: [],
+      params: {
         // 获取多少条数据
         limit: 30,
         // 关键字 “hot”
         order: 'hot',
         // 跳过多少条
         skip: 0
+      },
+      // 是否还有下一页
+      hasMore: true
+    }
+  },
+  mounted() {
+    /**
+     * 获取接口数据
+     */
+    this.getList()
+
+  },
+  methods: {
+
+    getList() {
+      /**
+       * 获取首页推荐数据
+       */
+      this.request({
+        url: 'http://157.122.54.189:9088/image/v3/homepage/vertical',
+        data: this.params
+      }).then((result) => {
+        if (result.res.vertical.length === 0) {
+          this.hasMore = false
+          return
+        }
+        if (this.recommends.length === 0) {
+          // 第一次发送请求
+          // 推荐模块
+          this.recommends = result.res.homepage[1].items
+          // 月份模块
+          this.months = result.res.homepage[2]
+          /*
+          * 引入moment.js
+          * 将时间戳转换为时间
+          * */
+          this.months.MM = moment(this.months.stime).format("MM")
+          this.months.DD = moment(this.months.stime).format("DD")
+        }
+
+        // 热门数据 数组拼接es6
+        this.hots = [...this.hots, ...result.res.vertical]
+      })
+    },
+    handleToLower() {
+      if (this.hasMore) {
+        this.params.skip += this.params.limit
+        this.getList()
+      } else {
+        uni.showToast({
+          title: '没有数据了',
+          icon: 'none'
+        })
       }
-    }).then((result) => {
-      // 推荐模块
-      this.recommends = result.res.homepage[1].items
-      // 月份模块
-      this.months = result.res.homepage[2]
-      console.log(this.months)
-      /*
-      * 引入moment.js
-      * 将时间戳转换为时间
-      * */
-      this.months.MM = moment(this.months.stime).format("MM")
-      this.months.DD = moment(this.months.stime).format("DD")
-    })
+    }
   }
 }
 </script>
 
 <style scoped lang="scss">
+.recommend_view {
+  height: calc(100vh - 36px);
+}
+
 .recommend_wrap {
   display: flex;
   flex-wrap: wrap;
 
   .recommend_item {
     width: 50%;
-    border: 5 rpx solid #fff;
+    border: 5rpx solid #fff;
   }
 }
 
@@ -93,31 +145,31 @@ export default {
   .months_title {
     display: flex;
     justify-content: space-between;
-    padding: 20 rpx;
+    padding: 20rpx;
 
     .months_title_info {
       color: $color;
-      font-size: 30 rpx;
+      font-size: 30rpx;
       font-weight: 600;
       display: flex;
 
       .months_info {
         text {
-          font-size: 36 rpx;
+          font-size: 36rpx;
         }
       }
 
       .months_text {
-        font-size: 34 rpx;
-        margin-left: 30 rpx;
+        font-size: 34rpx;
+        margin-left: 30rpx;
         color: #666;
         font-weight: 600;
       }
     }
 
     .months_title_more {
-      margin-top: 6 rpx;
-      font-size: 24 rpx;
+      margin-top: 6rpx;
+      font-size: 24rpx;
       color: $color;
     }
   }
@@ -128,12 +180,37 @@ export default {
 
     .months_item {
       width: 33.33%;
-      border: 5 rpx solid #fff;
+      border: 5rpx solid #fff;
+    }
+  }
+}
+
+.hots_wrap {
+  .hots_title {
+    padding: 20rpx;
+
+    text {
+      border-left: 15rpx solid $color;
+      padding-left: 20rpx;
+      font-size: 34rpx;
+      font-weight: 600;
     }
   }
 
-  .months_item {
+  .hots_content {
+    display: flex;
+    flex-wrap: wrap;
 
+    .hot_item {
+      width: 33.33%;
+      border: 5rpx solid #fff;
+
+      image {
+
+      }
+    }
   }
 }
+
+
 </style>
