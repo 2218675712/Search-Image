@@ -111,6 +111,9 @@ export default {
         this.hots = [...this.hots, ...result.res.vertical]
       })
     },
+    /**
+     * 加载更多推荐数据
+     */
     handleToLower() {
       if (this.hasMore) {
         this.params.skip += this.params.limit

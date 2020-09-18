@@ -62,6 +62,10 @@ export default {
       if (this.current !== e.currentIndex) {
         this.current = e.currentIndex;
       }
+      // 设置页面标题
+      uni.setNavigationBarTitle({
+        title:this.items[this.current].title
+      })
     }
   }
 }

@@ -4,7 +4,7 @@
 
 <script>
 export default {
-name: "home-category"
+  name: "home-category"
 }
 </script>
 
