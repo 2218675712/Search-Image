@@ -11,12 +11,13 @@
       </swiper>
     </view>
     <view class="album_list">
-      <view
+      <navigator
           class="album_item"
           v-for="item in album"
-          :key="item.id">
+          :key="item.id"
+          :url="`/pages/album/index?id=${item.id}`">
         <view class="album_img">
-          <image :src="item.cover"></image>
+          <image mode="aspectFill" :src="item.cover"></image>
         </view>
         <view class="album_info">
           <view class="album_name">{{item.name}}</view>
@@ -25,7 +26,7 @@
             <view class="album_attention"> + 关注</view>
           </view>
         </view>
-      </view>
+      </navigator>
     </view>
 
   </scroll-view>
