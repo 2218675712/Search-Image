@@ -17,16 +17,20 @@
       </view>
     </view>
     <view class="album_list">
-      <view class="album_item" v-for="item in wallpaper" :key="item.id">
+      <view class="album_item" v-for="(item,index) in wallpaper" :key="item.id">
+        <go-detail :list="wallpaper" :index="index">
         <image mode="widthFix" :src="item.thumb+item.rule.replace('$<Height>',375)"></image>
+        </go-detail>
       </view>
     </view>
   </view>
 </template>
 
 <script>
+import GoDetail from "@/components/home/goDetail/goDetail";
 export default {
   name: "index",
+  components: {GoDetail},
   data() {
     return {
       params: {
