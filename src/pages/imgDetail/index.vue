@@ -12,7 +12,9 @@
     </view>
     <!--    高清大图-->
     <view class="high_img">
+      <swiper-action @swiperAction="handleSwiperAction">
       <image mode="widthFix" :src='imgDetail.thumb'></image>
+      </swiper-action>
     </view>
     <!--    点赞-->
     <view class="user_rank">
@@ -118,10 +120,12 @@
 
 <script>
 import moment from "moment";
+import SwiperAction from "@/components/swiperAction/swiperAction";
 
 moment.locale("zh-cn");
 export default {
   name: 'index',
+  components: {SwiperAction},
   data() {
     return {
       // 图片信息对象
@@ -141,7 +145,6 @@ export default {
     this.imgDetail.cnTime = moment(this.imgDetail.atime * 1000).fromNow()
     // 获取图片评论
     this.getComments(this.imgDetail.id)
-    console.log(this.imgDetail.id)
   },
   methods: {
     /**
@@ -161,6 +164,9 @@ export default {
         this.hot = result.res.hot
         this.comment = result.res.comment
       })
+    },
+    handleSwiperAction(e){
+      console.log(e)
     }
   }
 }
