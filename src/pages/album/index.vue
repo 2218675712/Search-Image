@@ -19,7 +19,7 @@
     <view class="album_list">
       <view class="album_item" v-for="(item,index) in wallpaper" :key="item.id">
         <go-detail :list="wallpaper" :index="index">
-        <image mode="widthFix" :src="item.thumb+item.rule.replace('$<Height>',375)"></image>
+        <image mode="aspectFill" :src="item.thumb+item.rule.replace('$<Height>',375)"></image>
         </go-detail>
       </view>
     </view>
@@ -150,7 +150,7 @@ export default {
     border: 3rpx solid #fff;
 
     image {
-
+      height: 160rpx;
     }
   }
 }

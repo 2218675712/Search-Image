@@ -13,7 +13,7 @@
     <!--    高清大图-->
     <view class="high_img">
       <swiper-action @swiperAction="handleSwiperAction">
-      <image mode="widthFix" :src='imgDetail.thumb'></image>
+        <image mode="widthFix" :src='imgDetail.thumb'></image>
       </swiper-action>
     </view>
     <!--    点赞-->
@@ -135,18 +135,30 @@ export default {
       // 最热评论
       hot: [],
       // 最新评论
-      comment: []
+      comment: [],
+      // 图片索引
+      imgIndex: 0
     }
   },
   onLoad: function () {
-    const {imgList, imgIndex} = getApp().globalData
-    this.imgDetail = imgList[imgIndex]
-    // XX年前的数据
-    this.imgDetail.cnTime = moment(this.imgDetail.atime * 1000).fromNow()
-    // 获取图片评论
-    this.getComments(this.imgDetail.id)
+    const {imgIndex} = getApp().globalData
+    this.imgIndex = imgIndex
+    // 获取资源
+    this.getData()
+
   },
   methods: {
+    /*
+    * 获取图片列表
+    * */
+    getData() {
+      const {imgList} = getApp().globalData
+      this.imgDetail = imgList[this.imgIndex]
+      // XX年前的数据
+      this.imgDetail.cnTime = moment(this.imgDetail.atime * 1000).fromNow()
+      // 获取图片评论
+      this.getComments(this.imgDetail.id)
+    },
     /**
      * 获取图片评论
      * @param id
@@ -165,8 +177,32 @@ export default {
         this.comment = result.res.comment
       })
     },
-    handleSwiperAction(e){
-      console.log(e)
+    /**
+     * 滑动事件
+     * @param e 判断左滑还是右滑
+     */
+    handleSwiperAction(e) {
+      /*
+      * 1用户左滑imgIndex++
+      * 2用户右滑imgIndex--
+      * 3判断数组是否越界问题！！
+      * */
+      const {imgList} = getApp().globalData
+      if (e.direction === "left" && this.imgIndex < imgList.length - 1) {
+        // 可以进行  左滑  加载下一页
+        this.imgIndex++
+        this.getData()
+
+      } else if (e.direction === "right" && this.imgIndex > 0) {
+        // 可以进行  右滑  加载下一页
+        this.imgIndex--
+        this.getData()
+      } else {
+        uni.showToast({
+          title: "没有数据了",
+          icon: "none"
+        })
+      }
     }
   }
 }
@@ -343,6 +379,7 @@ export default {
           image {
             width: 40rpx;
             height: 40rpx;
+            display: inline-block;
           }
         }
 
