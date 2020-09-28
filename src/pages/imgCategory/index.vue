@@ -1,24 +1,24 @@
 <template>
-    <view>
-      <view class="category_tab">
-        <view class="category_tab_title">
-          <view class="title_inner">
-            <uni-segmented-control
-                :current="current"
-                :values="items.map(v=>v.title)"
-                @clickItem="onClickItem"
-                style-type="text"
-                active-color="#d4237a"></uni-segmented-control>
-          </view>
-          <view class="iconfont iconsearch"></view>
+  <view>
+    <view class="category_tab">
+      <view class="category_tab_title">
+        <view class="title_inner">
+          <uni-segmented-control
+              :current="current"
+              :values="items.map(v=>v.title)"
+              @clickItem="onClickItem"
+              style-type="text"
+              active-color="#d4237a"></uni-segmented-control>
         </view>
-      </view>
-      <view class="category_tab_content">
-        <view class="cate_item" v-for="item in vertical" :key="item.id">
-          <image :src="item.thumb" mode="widthFix"></image>
-        </view>
+        <view class="iconfont iconsearch"></view>
       </view>
     </view>
+    <scroll-view @scrolltolower="handleScrolltolower" scroll-y class="category_tab_content" enable-flex>
+      <view class="cate_item" v-for="item in vertical" :key="item.id">
+        <image :src="item.thumb" mode="widthFix"></image>
+      </view>
+    </scroll-view>
+  </view>
 </template>
 
 <script>
@@ -49,7 +49,8 @@ export default {
       },
       id: 0,
       // 页面显示的数组
-      vertical: []
+      vertical: [],
+      hasMore: true
     }
   },
   onLoad(options) {
@@ -57,9 +58,15 @@ export default {
     this.getList()
   },
   methods: {
+    /*
+    * 点击切换标题
+    * */
     onClickItem(e) {
       if (this.current !== e.currentIndex) {
         this.current = e.currentIndex;
+      } else {
+        // 点击的是相同的标题,return返回
+        return
       }
       // 设置页面标题
       uni.setNavigationBarTitle({
@@ -67,16 +74,47 @@ export default {
       })
 
       this.params.order = this.items[this.current].order
-
+      /*
+      * 清空跳过数据
+      * 清空列表数据
+      * */
+      this.params.skip = 0
+      this.vertical = []
       this.getList()
     },
+    /**
+     * 获取列表数据
+     */
     getList() {
       this.request({
         url: `http://157.122.54.189:9088/image/v1/vertical/category/${this.id}/vertical`,
         data: this.params
       }).then((result) => {
-        this.vertical = result.res.vertical
+        if (result.res.vertical.length === 0) {
+          this.hasMore = false
+          uni.showToast({
+            title: '没有更多数据了',
+            icon: 'none'
+          })
+          return
+        }
+        this.vertical = [...this.vertical, ...result.res.vertical]
+
       })
+    },
+    /**
+     * 加载下一页数据
+     */
+    handleScrolltolower() {
+      if (this.hasMore) {
+        this.params.skip += this.params.limit
+        this.getList()
+      } else {
+        uni.showToast({
+          title: '没有更多数据了',
+          icon: 'none'
+        })
+      }
     }
   }
 }
@@ -102,13 +140,16 @@ export default {
   }
 
 }
+
 .category_tab_content {
   display: flex;
   flex-wrap: wrap;
+  height: calc(100vh - 36px);
 
   .cate_item {
     width: 33.33%;
     border: 5rpx solid #ffffff;
+
     image {
     }
   }
