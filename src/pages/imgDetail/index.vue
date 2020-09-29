@@ -3,10 +3,10 @@
     <!--    用户信息-->
     <view class="user_info">
       <view class="user_icon">
-        <image mode="widthFix" :src="imgDetail.user.avatar"></image>
+        <image mode="widthFix" :src="imgDetail.user.avatar?imgDetail.user.avatar:'http://img0.adesk.com/download/5dee04f804220801b33bebf7'"></image>
       </view>
       <view class="user_desc">
-        <view class="user_name">{{imgDetail.user.name}}</view>
+        <view class="user_name">{{imgDetail.user.name||'未找到用户名'}}</view>
         <view class="user_time">{{imgDetail.cnTime}}</view>
       </view>
     </view>
@@ -158,6 +158,7 @@ export default {
     getData() {
       const {imgList} = getApp().globalData
       this.imgDetail = imgList[this.imgIndex]
+      console.log(this.imgDetail)
       // XX年前的数据
       this.imgDetail.cnTime = moment(this.imgDetail.atime * 1000).fromNow()
       // 获取图片评论
